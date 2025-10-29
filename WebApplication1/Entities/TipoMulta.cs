@@ -22,7 +22,6 @@ namespace WebApplication1.Entities
 
         [Column("valor_multa")]
         [Required]
-        [Precision(10, 2)]
         public decimal ValorMulta { get; set; }
 
         [Column("gravidade")]

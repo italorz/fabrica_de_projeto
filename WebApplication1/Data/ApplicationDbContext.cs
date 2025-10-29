@@ -5,19 +5,9 @@ namespace WebApplication1.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        private readonly DatabaseConfig? _databaseConfig;
-
-        // Construtor original para uso com injeção de dependência
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-            _databaseConfig = null;
-        }
-
-        // Novo construtor para uso com configuração direta
-        public ApplicationDbContext(DatabaseConfig databaseConfig)
-        {
-            _databaseConfig = databaseConfig;
         }
 
         public DbSet<Usuario> Usuarios { get; set; }
@@ -28,9 +18,9 @@ namespace WebApplication1.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured && _databaseConfig != null)
+            if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(_databaseConfig.GetConnectionString());
+                optionsBuilder.UseSqlite("Data Source=multas.db");
             }
         }
 
@@ -71,6 +61,11 @@ namespace WebApplication1.Data
             modelBuilder.Entity<TipoMulta>()
                 .Property(t => t.Gravidade)
                 .HasConversion<string>();
+
+            // Configuração de precisão decimal para SQLite
+            modelBuilder.Entity<TipoMulta>()
+                .Property(t => t.ValorMulta)
+                .HasPrecision(10, 2);
         }
     }
 }

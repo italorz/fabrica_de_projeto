@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Interfaces;
 using WebApplication1.Repositories;
+using WebApplication1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,23 +11,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configuração direta do banco de dados PostgreSQL
-var databaseConfig = new DatabaseConfig
-{
-    Host = "localhost",
-    Database = "multasdb",
-    Username = "postgres",
-    Password = "postgres",
-    Port = 5432,
-    SslMode = false
-};
-
-// Registrar DatabaseConfig como singleton para uso em toda a aplicação
-builder.Services.AddSingleton(databaseConfig);
-
-// Configurar DbContext com a configuração direta
+// Configurar DbContext com SQLite
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(databaseConfig.GetConnectionString()));
+    options.UseSqlite("Data Source=multas.db"));
 
 // Register repositories
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
@@ -35,6 +22,14 @@ builder.Services.AddScoped<ICondutorRepository, CondutorRepository>();
 builder.Services.AddScoped<IVeiculoRepository, VeiculoRepository>();
 builder.Services.AddScoped<ITipoMultaRepository, TipoMultaRepository>();
 builder.Services.AddScoped<IMultaRepository, MultaRepository>();
+
+// Register services
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<ICondutorService, CondutorService>();
+builder.Services.AddScoped<IVeiculoService, VeiculoService>();
+builder.Services.AddScoped<ITipoMultaService, TipoMultaService>();
+builder.Services.AddScoped<IMultaService, MultaService>();
+builder.Services.AddScoped<IAIProcessingService, AIProcessingService>();
 
 var app = builder.Build();
 
